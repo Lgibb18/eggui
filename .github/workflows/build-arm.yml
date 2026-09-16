@@ -25,6 +25,9 @@ jobs:
                 libx11-dev libxcb-dev libxcursor-dev libxi-dev \
                 mesa-dev wayland-dev
               cargo build --release --locked -j4
+              ls -lh target/release/eggui
+              strip --strip-unneeded target/release/eggui
+              ls -lh target/release/eggui
               mkdir -p dist
               cp target/release/eggui dist/eggui
             '
