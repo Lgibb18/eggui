@@ -1,0 +1,35 @@
+name: build for pi
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04-arm
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build in Alpine
+        run: |
+          docker run --rm \
+            -v "$PWD:/app" -w /app \
+            alpine:3.24 sh -euxc '
+              apk add --no-cache cargo build-base pkgconf \
+                fontconfig-dev libxkbcommon-dev libxkbcommon-x11 \
+                libx11-dev libxcb-dev libxcursor-dev libxi-dev \
+                mesa-dev wayland-dev
+              cargo build --release --locked -j4
+              mkdir -p dist
+              cp target/release/eggui dist/eggui
+            '
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: eggui-alpine-arm64
+          path: dist/eggui
